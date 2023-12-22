@@ -52,9 +52,15 @@ $(document).ready(()=>{
         localStorage.removeItem("name")
         if (stompClient !== null) {
             stompClient.disconnect()
-
+            //show the logout modal
+            $("#logoutModal").modal("show")
+            // Hide the chat room after delay
+            setTimeout(()=>{
             $("#name-form").removeClass('d-none')
             $("#chat-room").addClass('d-none')
+                //close the modal after hiding the chat room
+                $("#logoutModal").modal("hide")
+            },2000)
         }
     })
 

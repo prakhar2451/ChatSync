@@ -30,6 +30,13 @@
 			<artifactId>sockjs-client</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.webjars/popper.js -->
+		<dependency>
+			<groupId>org.webjars</groupId>
+			<artifactId>popper.js</artifactId>
+			<version>1.12.9-1</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.webjars</groupId>
