@@ -1,73 +1,82 @@
 var stompClient = null
 function connect() {
-    let socket = new SockJS("/server1")
+    let socket = new SockJS("/server1");
+    stompClient = Stomp.over(socket);
 
-    stompClient = Stomp.over(socket)
+    stompClient.connect({}, function (frame) {
+        console.log("Connected: " + frame);
 
-    stompClient.connect({},function (frame){
-        console.log("Connected: " +frame)
+        $("#name-form").addClass('d-none');
+        $("#chat-room").removeClass('d-none');
 
-        $("#name-form").addClass('d-none')
-        $("#chat-room").removeClass('d-none')
+        // Subscribe
+        stompClient.subscribe("/topic/return-to", function (response) {
+            showMessage(JSON.parse(response.body));
+        });
 
-        //subscribe
-        stompClient.subscribe("/topic/return-to", function (response){
-            showMessage(JSON.parse(response.body))
-
-        })
-
-
-    })
+        // After connecting, enable the message input field and buttons
+        enableChatControls();
+    });
 }
 
+// Add a new function to enable chat controls
+function enableChatControls() {
+    $("#message-value").prop("disabled", false);
+    $("#send-btn").prop("disabled", false);
+    $("#logout-btn").prop("disabled", false);
+}
+
+
+
 function showMessage(message) {
-    console.log("Received message:", message);
     if (message.type === "leave") {
-        console.log("Processing leave message:", message);
-        $("#message-container-table").prepend(`<tr><td><i>${message.name} ${message.content}</i></td></tr>`);
+        $("#message-container-table").prepend(`<tr><td><i>${message.name}${message.content}</i></td></tr>`);
+    } else if (message.type === "join") {
+        $("#message-container-table").prepend(`<tr><td><i>${message.name}${message.content}</i></td></tr>`);
     } else {
-        console.log("Processing regular message:", message);
         $("#message-container-table").prepend(`<tr><td><b>${message.name} :</b> ${message.content}</td></tr>`);
     }
 }
 
 
-function sendMessage(){
-    let jsonObj = {
-        name: localStorage.getItem("name"),
-        content: $("#message-value").val()
-    }
+function sendMessage() {
+    if (stompClient && stompClient.connected) {
+        let jsonObj = {
+            name: localStorage.getItem("name"),
+            content: $("#message-value").val()
+        };
 
-    stompClient.send("/app/message",{},JSON.stringify(jsonObj))
+        stompClient.send("/app/message", {}, JSON.stringify(jsonObj));
+    } else {
+        console.error("WebSocket connection is not established yet. Please wait for the connection to be established.");
+    }
 }
 
 $(document).ready(()=>{
 
-    $("#login").click(()=>{
-
-       let name = $("#name-value").val().trim()
+    $("#login").click(() => {
+        let name = $("#name-value").val().trim();
 
         if (name !== "") {
-            localStorage.setItem("name", name)
-            $("#name-title").html(`Welcome, <b>${name}</b>`)
-            connect();
+            localStorage.setItem("name", name);
+            $("#name-title").html(`Welcome, <b>${name}</b>`);
+            connect(); // Ensure connect is called first
+            sendMessage(); // Then call sendMessage if needed
         } else {
-            alert("Enter a valid name.")
+            // Show an error message or handle the case where the name is blank
+            console.error("Please enter a valid name.");
         }
-    })
+    });
+
 
     $("#send-btn").click(()=>{
         sendMessage();
     })
 
     $("#logout-btn").click(() => {
-        // Check if the name is available in localStorage
-        let userName = localStorage.getItem("name");
-
-        if (userName) {
             // Send a "leave" message
             let leaveMessage = {
-                name: userName,
+                name: localStorage.getItem("name"),
                 content: " has left the chat",
                 type: "leave"
             };
@@ -85,11 +94,8 @@ $(document).ready(()=>{
                 // Close the modal after hiding the chat room (optional)
                 $("#logoutModal").modal("hide");
             }, 2000); // Adjust the delay as needed
-        } else {
+
             // Handle the case where the user name is not available in localStorage
             console.error("User name not found in localStorage.");
-        }
-    });
-
-
+        });
 })
