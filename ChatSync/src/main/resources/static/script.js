@@ -21,7 +21,14 @@ function connect() {
 }
 
 function showMessage(message) {
-    $("#message-container-table").prepend(`<tr><td><b>${message.name} :</b> ${message.content}</td></tr>`);
+    console.log("Received message:", message);
+    if (message.type === "leave") {
+        console.log("Processing leave message:", message);
+        $("#message-container-table").prepend(`<tr><td><i>${message.name} ${message.content}</i></td></tr>`);
+    } else {
+        console.log("Processing regular message:", message);
+        $("#message-container-table").prepend(`<tr><td><b>${message.name} :</b> ${message.content}</td></tr>`);
+    }
 }
 
 
@@ -38,30 +45,51 @@ $(document).ready(()=>{
 
     $("#login").click(()=>{
 
-       let name = $("#name-value").val()
-        localStorage.setItem("name", name)
-        $("#name-title").html(`Welcome, <b>${name}</b>`)
-        connect();
+       let name = $("#name-value").val().trim()
+
+        if (name !== "") {
+            localStorage.setItem("name", name)
+            $("#name-title").html(`Welcome, <b>${name}</b>`)
+            connect();
+        } else {
+            alert("Enter a valid name.")
+        }
     })
 
     $("#send-btn").click(()=>{
         sendMessage();
     })
 
-    $("#logout-btn").click(()=>{
-        localStorage.removeItem("name")
-        if (stompClient !== null) {
-            stompClient.disconnect()
-            //show the logout modal
-            $("#logoutModal").modal("show")
-            // Hide the chat room after delay
-            setTimeout(()=>{
-            $("#name-form").removeClass('d-none')
-            $("#chat-room").addClass('d-none')
-                //close the modal after hiding the chat room
-                $("#logoutModal").modal("hide")
-            },2000)
+    $("#logout-btn").click(() => {
+        // Check if the name is available in localStorage
+        let userName = localStorage.getItem("name");
+
+        if (userName) {
+            // Send a "leave" message
+            let leaveMessage = {
+                name: userName,
+                content: " has left the chat",
+                type: "leave"
+            };
+
+            // Send the message to the server
+            stompClient.send("/app/leave", {}, JSON.stringify(leaveMessage));
+
+            // Show the logout modal (optional)
+            $("#logoutModal").modal("show");
+
+            // Hide the chat room after a delay (optional)
+            setTimeout(() => {
+                $("#name-form").removeClass('d-none');
+                $("#chat-room").addClass('d-none');
+                // Close the modal after hiding the chat room (optional)
+                $("#logoutModal").modal("hide");
+            }, 2000); // Adjust the delay as needed
+        } else {
+            // Handle the case where the user name is not available in localStorage
+            console.error("User name not found in localStorage.");
         }
-    })
+    });
+
 
 })
