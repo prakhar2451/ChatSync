@@ -1,3 +1,115 @@
-#name-form{
-    height:100vh ;
+/* style.css */
+
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #343a40;
+    color: #fff;
+    padding-top: 50px;
+}
+
+/* Center content vertically */
+#name-form,
+#chat-room {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#name-form {
+    background-color: #007bff;
+}
+
+/* Input and button styling */
+.input-group input.form-control {
+    border-radius: 0;
+    border: 2px solid #343a40;
+}
+
+.input-group .input-group-append .btn {
+    border-radius: 0;
+    background-color: #343a40;
+    color: #fff;
+    border: 2px solid #343a40;
+}
+
+.input-group .input-group-append .btn:hover {
+    background-color: #495057;
+}
+
+/* Card styling for chat-room */
+.card {
+    background-color: #495057;
+    color: #fff;
+    border: none;
+}
+
+.card-header {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.card-body {
+    background-color: #6c757d;
+}
+
+.card-body .input-group input.form-control {
+    border-radius: 0;
+    border: 2px solid #343a40;
+    background-color: #adb5bd;
+}
+
+.card-body .input-group .input-group-append .btn {
+    border-radius: 0;
+    background-color: #343a40;
+    color: #fff;
+    border: 2px solid #343a40;
+}
+
+.card-body .input-group .input-group-append .btn:hover {
+    background-color: #495057;
+}
+
+/* Table styling for messages */
+#message-container-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+#message-container-table tr {
+    background-color: #495057;
+    color: #fff;
+    padding: 10px;
+}
+
+#message-container-table td {
+    padding: 10px;
+    border-top: 2px solid #343a40;
+    border-bottom: 2px solid #343a40;
+}
+
+/* Modal styling */
+.modal-content {
+    background-color: #343a40;
+    color: #fff;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: 1px solid #495057;
+}
+
+.modal-header .close {
+    color: #fff;
+}
+
+.modal-body {
+    background-color: #6c757d;
+}
+
+.modal-body p {
+    color: #fff;
 }
